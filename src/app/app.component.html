@@ -4,8 +4,8 @@
   :host {
     --bright-blue: oklch(51.01% 0.274 263.83);
     --electric-violet: oklch(76.843% 0.03626 307.859);
-    --french-violet: oklch(47.66% 0.246 305.88);
-    --vivid-pink: oklch(69.02% 0.277 332.77);
+    --french-violet: oklch(32.248% 0.00225 324.868);
+    --vivid-pink: oklch(83.626% 0.01059 325.252);
     --hot-red: oklch(45.531% 0.06938 217.307);
     --orange-red: oklch(63.271% 0.077 214.898);
 
@@ -198,6 +198,20 @@
     border-color: var(--bright-blue);
   }
 
+  .form-input.error {
+    border-color: #dc2626;
+    background-color: #fef2f2;
+  }
+
+  .field-error {
+    color: #dc2626;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
   .button-group {
     display: flex;
     gap: 1rem;
@@ -291,20 +305,26 @@
 
 <main class="main">
   <div class="cifrador-container">
-    <h1 class="cifrador-title">🔐 Cifrador Vigenère</h1>
+    <h1 class="cifrador-title">🔮 Cifrador Vigenère</h1>
     
     <form (ngSubmit)="cifrarVigenere()" #cifradorForm="ngForm">
       <div class="form-group">
-        <label for="nombre" class="form-label">Texto a cifrar:</label>
+        <label for="nombre" class="form-label">Mensaje a cifrar:</label>
         <input
           type="text"
           id="nombre"
           name="nombre"
           [(ngModel)]="nombre"
+          (ngModelChange)="onNombreChange()"
+          (keypress)="onKeyPress($event)"
           class="form-input"
-          placeholder="Ingresa el texto que quieres cifrar..."
+          [class.error]="nombreError"
+          placeholder="Ingresa el texto que quieres cifrar"
           required
         />
+        <div *ngIf="nombreError" class="field-error">
+          ⚠️ {{ nombreError }}
+        </div>
       </div>
 
       <div class="form-group">
@@ -314,15 +334,25 @@
           id="clave"
           name="clave"
           [(ngModel)]="clave"
+          (ngModelChange)="onClaveChange()"
+          (keypress)="onKeyPress($event)"
           class="form-input"
-          placeholder="Ingresa la clave para el cifrado..."
+          [class.error]="claveError"
+          placeholder="Ingresa la clave para el cifrado "
           required
         />
+        <div *ngIf="claveError" class="field-error">
+          ⚠️ {{ claveError }}
+        </div>
       </div>
 
       <div class="button-group">
-        <button type="submit" class="btn btn-primary" [disabled]="!cifradorForm.form.valid">
-          🔒 Cifrar Texto
+        <button 
+          type="submit" 
+          class="btn btn-primary" 
+          [disabled]="!cifradorForm.form.valid || nombreError || claveError || !nombre.trim() || !clave.trim()"
+        >
+           Cifrar Texto
         </button>
         <button type="button" class="btn btn-secondary" (click)="limpiarFormulario()">
           🗑️ Limpiar
@@ -341,14 +371,16 @@
       <div class="resultado-text">{{ resultado }}</div>
     </div>
 
-    <!-- Información sobre el cifrado Vigenère
-    <div style="margin-top: 2rem; padding: 1rem; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #0ea5e9;">
-      <h3 style="margin: 0 0 0.5rem 0; color: #0c4a6e;">ℹ️ ¿Qué es el cifrado Vigenère?</h3>
-      <p style="margin: 0; color: #0c4a6e; font-size: 0.9rem;">
-        El cifrado Vigenère es un método de cifrado polialfabético que usa una palabra clave para determinar 
-        qué alfabeto de sustitución usar para cada letra del texto. Es más seguro que el cifrado César simple.
-      </p>
-    </div> -->
+    <!-- Información sobre el cifrado Vigenère -->
+      <!-- <h3 style="margin: 0 0 0.5rem 0; color: #0c4a6e;">ℹ️ Información importante:</h3> -->
+      <!-- <ul style="margin: 0; color: #0c4a6e; font-size: 0.9rem; padding-left: 1.2rem;">
+        <li><strong>Alfabeto español:</strong> Usa 27 caracteres (A-Z + Ñ)</li>
+        <li><strong>Solo letras:</strong> No se permiten números en el texto ni en la clave</li>
+        <li><strong>Espacios:</strong> Los espacios se eliminarán automáticamente del resultado</li>
+        <li><strong>Mayúsculas:</strong> El texto se convertirá automáticamente a mayúsculas</li>
+        <li><strong>Ejemplo:</strong> "España" + "CLAVE" = "GXQÑÑA"</li>
+      </ul> -->
+    
   </div>
 </main>
 
